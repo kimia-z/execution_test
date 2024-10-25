@@ -52,16 +52,16 @@ bool	check_builtin(t_command *commands, t_parser *parser)
 		return (ft_echo(commands, parser), true);
 	// if (cmd == CD)
 	// 	return (ft_cd(commands, parser), true);
-	// if (cmd == PWD)
-	// 	return (ft_pwd(commands, parser), true);
+	if (cmd == PWD)
+		return (ft_pwd(commands, parser), true);
 	// if (cmd == ENV)
 	// 	return (ft_env(commands, parser), true);
 	// if (cmd == EXPORT)
 	// 	return (ft_export(commands, parser), true);
 	// if (cmd == UNSET)
 	// 	return (ft_unset(commands, parser), true);
-	// if (cmd == EXIT)
-	// 	return (ft_exit(commands, parser), true);
+	if (cmd == EXIT)
+		return (ft_exit(commands, parser), true);
 	return (false);
 }
 /*
@@ -301,7 +301,6 @@ int	ft_execute(t_parser *parser)
 	{
 		if (check_builtin(parser->commands, parser) == false)
 		{
-			printf("dakhel\n");
 			// find/have/check path
 			//parser->exit_status = execute_one_cmd(parser);
 			//free path?
@@ -316,20 +315,8 @@ int	ft_execute(t_parser *parser)
 
 int main(void)
 {
-	//cmd1: echo "kimia"
-	t_parser	parser;
-	printf("hiii\n");
-	parser.commands->command[0] = "echo";
-	parser.commands->command[1] = "-n";
-	parser.commands->command[2] = "kimia";
-	parser.commands->command[3] = NULL;
-	parser.commands->next = NULL;
-	parser.commands->path = NULL;
-	parser.commands->infile_fd = -2;
-	parser.commands->outfile_fd = -2;
-	parser.exit_status = -2;
-	parser.nb_pipes = 0;
-	
-	ft_execute(&parser);
+	test_echo();
+	//test_pwd();
+	//test_exit();
 	return 0;
 }

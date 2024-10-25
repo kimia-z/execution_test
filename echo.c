@@ -7,37 +7,6 @@
 			 echo -n -n -n hi
 */
 
-int	ft_strncmp(const char *s1, const char *s2, size_t n)
-{
-	const unsigned char	*s1p;
-	const unsigned char	*s2p;
-
-	s1p = (const unsigned char *)s1;
-	s2p = (const unsigned char *)s2;
-	if (s1p == 0 && s2p == 0)
-		return (0);
-	while (n > 0 && *s1p && *s2p && (*s1p == *s2p))
-	{
-		s1p++;
-		s2p++;
-		n--;
-	}
-	if (n == 0 || (*s1p == '\0' && *s2p == '\0'))
-		return (0);
-	else
-		return (*s1p - *s2p);
-}
-
-size_t	ft_strlen(const char *s)
-{
-	size_t	i;
-	if (!s)
-		return (0);
-	i = 0;
-	while (s[i] != '\0')
-		i++;
-	return (i);
-}
 
 static bool	check_newline(t_command *commands, int *position)
 {
@@ -86,15 +55,15 @@ void	ft_echo(t_command *commands, t_parser *parser)
 	is_newline = check_newline(commands, &position);
 	while (commands->command[position])
 	{
-		write(outfile, commands->command[position], ft_strlen(commands->command[position]));
+		ft_putstr_fd(commands->command[position], outfile);
 		if (commands->command[++position])
 		{
-			write(outfile, " ", 1);
+			ft_putchar_fd(' ', outfile);
 		}
 	}
 	if (is_newline)
 	{
-		write(outfile, "\n", 1);
+		ft_putchar_fd('\n', outfile);
 	}
 	parser->exit_status = 0;
 }

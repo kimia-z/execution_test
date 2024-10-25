@@ -62,5 +62,21 @@ typedef enum e_builtin
 	UNKNOWN
 }	t_builtin;
 
+int		ft_execute(t_parser *parser);
+
 void	ft_echo(t_command *commands, t_parser *parser);
+void	ft_pwd(t_command *commands, t_parser *parser);
+void	ft_exit(t_command *commands, t_parser *parser);
+
+void	ft_putendl_fd(char *s, int fd);
+void	ft_putstr_fd(char *s, int fd);
+void	ft_putchar_fd(char c, int fd);
 size_t	ft_strlen(const char *s);
+int		ft_strncmp(const char *s1, const char *s2, size_t n);
+int		ft_isdigit(int c);
+int		ft_isspace(int c);
+
+
+void	test_echo(void);
+void	test_pwd(void);
+void	test_exit(void);
