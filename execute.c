@@ -50,16 +50,16 @@ bool	check_builtin(t_command *commands, t_parser *parser)
 	cmd = get_builtin_command(commands->command[0]);
 	if (cmd == ECH)
 		return (ft_echo(commands, parser), true);
-	// if (cmd == CD)
-	// 	return (ft_cd(commands, parser), true);
+	if (cmd == CD)
+		return (ft_cd(commands, parser), true);
 	if (cmd == PWD)
 		return (ft_pwd(commands, parser), true);
-	// if (cmd == ENV)
-	// 	return (ft_env(commands, parser), true);
+	if (cmd == ENV)
+		return (ft_env(commands, parser), true);
 	// if (cmd == EXPORT)
 	// 	return (ft_export(commands, parser), true);
-	// if (cmd == UNSET)
-	// 	return (ft_unset(commands, parser), true);
+	if (cmd == UNSET)
+		return (ft_unset(commands, parser), true);
 	if (cmd == EXIT)
 		return (ft_exit(commands, parser), true);
 	return (false);
@@ -313,10 +313,15 @@ int	ft_execute(t_parser *parser)
 	return (parser->exit_status);
 }
 
-int main(void)
+int main(int argc, char **argv, char **env)
 {
-	test_echo();
+	(void)argc;
+	(void)argv;
+	//test_echo();
 	//test_pwd();
 	//test_exit();
+	//test_env(env);
+	//test_unset(env);
+	test_cd(env);
 	return 0;
 }

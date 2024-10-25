@@ -1,4 +1,4 @@
-#include "lexer.h"
+#include "mini.h"
 
 /*
 	if pipe exist unset ignored
@@ -7,38 +7,45 @@
 	*- unset USER PWD
 */
 
-void	ft_unset(t_lexer *lexer)
+void	ft_unset(t_command *commands, t_parser *parser)
 {
 	int		i;
 	t_env	*current;
 	t_env	*previous;
 
 	i = 1;
-	if (lexer->pipe > 0 || !lexer->tokens[1])
+	if (parser->nb_pipes > 0 || !commands->command[1])
 	{
+		parser->exit_status = 0;
+		//test_print_env(parser->envs);
 		return ;
 	}
-	while (lexer->tokens[i])
+	while (commands->command[i])
 	{
-		current = lexer->env;
-		previous = NULL:
-		while (current)
+		current = parser->envs;
+		previous = NULL;
+		while (current != NULL)
 		{
-			if (strcmp(current->key, lexer->tokens[i]) == 0)
+			if (strcmp(current->key, commands->command[i]) == 0)
 			{
 				if (previous == NULL)
 				{
-					lexer->env = current->next;
+					parser->envs = current->next;
 				}
 				else
 				{
 					previous->next = current->next;
 				}
+				free(current->key);
+				free(current->value);
 				free (current);
 				break;
 			}
 			previous = current;
-			current = curent->next;
+			current = current->next;
 		}
+		i++;
 	}
+	parser->exit_status = 0;
+	//test_print_env(parser->envs);
 }

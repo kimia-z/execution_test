@@ -1,4 +1,4 @@
-#include "lexer.h"
+#include "mini.h"
 
 ////change directory function
 
@@ -23,30 +23,42 @@ t_env	*ft_search_list(char *key, t_env *env)
 	return (NULL);
 }
 
-void	ft_cd(t_lexer *lexer)
+void	ft_cd(t_command *commands, t_parser *parser)
 {
 	t_env	*temp;
 	char	*dir;
 
-	//temp = lexer->env;
-	if (!lexer->tokens[1])
+	temp = parser->envs;
+	if (!commands->command[1])
 	{
-		temp = ft_search_list("HOME", lexer->env);
+		temp = ft_search_list("HOME", parser->envs);
 		if (!temp)
 		{
 			ft_putstr_fd("minishell: cd: HOME not set\n", 2);
+			parser->exit_status = 1;
 			return ;
 		}
 		dir = temp->value;
 	}
-	else if (lexer->tokens[2])
+	else if (commands->command[2])
 	{
 		ft_putstr_fd("minishel: cd: too many arguments\n", 2);
+		parser->exit_status = 1;
 		return ;
 	}
 	else
 	{
-		dir = lexer->tokens[1];
+		dir = commands->command[1];
 	}
-	ft_change_dir(lexer, dir);
+	printf("dir:%s\n", dir);
+	if (chdir(dir) != 0)
+	{
+		ft_putstr_fd("minishel: cd: ", 2);
+		printf("%s: ", commands->command[1]);
+		ft_putstr_fd("No such file or directory\n", 2);
+		parser->exit_status = 1;
+		return ;
+	}
+	parser->exit_status = 0;
+	//ft_change_dir(parser, dir);
 }
