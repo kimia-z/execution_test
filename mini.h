@@ -32,7 +32,7 @@ typedef struct s_env
 typedef struct s_command
 {
 	char				**command;
-	char				*path;
+	char				*path; //char **path;
 	int					infile_fd;
 	int					outfile_fd;
 	char				*infile;
@@ -46,8 +46,8 @@ typedef struct s_parser
 	int					nb_pipes;
 	struct s_command	*commands;
 	// struct s_parser		*next;
-    //char				*envp;
-    struct s_env		*envs;
+	char				**arg_env;
+	struct s_env		*envs;
 }				t_parser;
 
 typedef enum e_builtin
@@ -80,11 +80,15 @@ size_t	ft_strlen(const char *s);
 int		ft_strncmp(const char *s1, const char *s2, size_t n);
 int		ft_isdigit(int c);
 int		ft_isspace(int c);
+int		ft_isalpha(int c);
 void	ft_bzero(void *s, size_t n);
+char	*ft_strchr(const char *s, int c);
 void	*ft_calloc(size_t nmemb, size_t size);
 char	*ft_strdup(const char *s);
 char	*ft_strtrim_beginning(char const *s1, char const *set);
 size_t	ft_strlcpy(char *dst, const char *src, size_t size);
+char	**ft_split(char const *s, char c);
+char	*ft_strjoin(const char *s1, const char *s2);
 t_env	*initial_env(char **env);
 void	free_env_list(t_env *head);
 

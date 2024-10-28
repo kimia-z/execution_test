@@ -245,8 +245,17 @@ int	pipeline(t_parser *parser)
 	}
 	return (parser->exit_status);
 }
+*/
 
-int	execute_one_cmd(t_parser *parser)
+void	write_stderr(char *errmsg)
+{
+	ft_putstr_fd("Error: ", STDERR_FILENO);
+	if (errmsg)
+		ft_putstr_fd(errmsg, STDERR_FILENO);
+	ft_putstr_fd("\n", STDERR_FILENO);
+}
+
+int	execute_one_cmd(t_parser *parser, t_command *commands)
 {
 	int	pid;
 	int	status;
@@ -256,41 +265,70 @@ int	execute_one_cmd(t_parser *parser)
 		write_stderr("failed in fork");
 	if (pid == 0)
 	{
-		if (parser->infile_fd == -1 || parser->outfile_fd == -1)
+		if (commands->infile_fd == -1 || commands->outfile_fd == -1)
 			return (EXIT_FAILURE);
-		if (parser->infile_fd >= 0)
+		if (commands->infile_fd >= 0)
 		{
-			if (dup2(parser->infile_fd, STDIN_FILENO) == -1)
+			if (dup2(commands->infile_fd, STDIN_FILENO) == -1)
 				return (EXIT_FAILURE);
 		}
-		if (parser->outfile >= 0)
+		if (commands->outfile >= 0)
 		{
-			if (dup2(parser->outfile_fd, STDOUT_FILENO) == -1)
+			if (dup2(commands->outfile_fd, STDOUT_FILENO) == -1)
 				return (EXIT_FAILURE);
 		}
-		if (parser->commands->path != NULL)
-			execve(parser->commands->path, parser->commands->command, parser->envp);
+		if (commands->path != NULL)
+			execve(commands->path, commands->command, parser->arg_env);
 		write_stderr("Command not found");
 		//free everything
 		exit(127);
 	}
-	//if parser->infile true
-	close (parser->infile_fd);
-	//if parser->outfile true
-	close (parser->outfile);
+	if (commands->infile_fd != -2)
+		close (commands->infile_fd);
+	if (commands->outfile_fd != -2)
+		close (commands->outfile);
 	// if there is here doc -> unlink
 	waitpid(pid, &status, 0);
 	if (WIFEXITED(status))
 		parser->exit_status = WEXITSTATUS(status);
 	return (parser->exit_status);
 }
-*/
+
 
 /*
 	-start of execution
 	-check the number of pipes for execution
 	-call their functions and store and retuen the exit status
 */
+
+// char	**find_path(int fd, char **my_path, char **cmd, char **envp)
+// {
+// 	int		i;
+// 	int		j;
+// 	char	*temp;
+
+// 	i = -1;
+// 	j = -1;
+// 	while (envp[++i])
+// 	{
+// 		if (ft_strncmp(envp[i], "PATH=", 5) == 0)
+// 		{
+// 			my_path = ft_split(envp[i] + 5, ':');
+// 			if (my_path == NULL)
+// 				//error
+// 			while (my_path[++j])
+// 			{
+// 				temp = ft_strjoin(my_path[j], "/");
+// 				if (temp == NULL)
+// 					//error
+// 				free(my_path[j]);
+// 				my_path[j] = temp;
+// 			}
+// 			break ;
+// 		}
+// 	}
+// 	return (my_path);
+// }
 
 int	ft_execute(t_parser *parser)
 {
@@ -302,7 +340,7 @@ int	ft_execute(t_parser *parser)
 		if (check_builtin(parser->commands, parser) == false)
 		{
 			// find/have/check path
-			//parser->exit_status = execute_one_cmd(parser);
+			parser->exit_status = execute_one_cmd(parser, parser->commands);
 			//free path?
 		}
 	}

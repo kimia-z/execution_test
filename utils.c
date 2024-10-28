@@ -1,5 +1,137 @@
 #include "mini.h"
 
+size_t	ft_strlcat(char *dst, const char *src, size_t size)
+{
+	size_t	d_len;
+	size_t	s_len;
+
+	d_len = 0;
+	while (d_len < size && dst[d_len] != 0)
+		d_len++;
+	if (d_len == size)
+		return (size + ft_strlen(src));
+	s_len = ft_strlcpy(dst + d_len, src, size - d_len);
+	return (d_len + s_len);
+}
+
+static unsigned int	num_of_substrings(char const *s, char c)
+{
+	unsigned int	i;
+
+	i = 0;
+	while (*s)
+	{
+		while (*s == c)
+			s++;
+		if (*s && *s != c)
+		{
+			i++;
+			while (*s && *s != c)
+				s++;
+		}
+	}
+	return (i);
+}
+
+static char	*create_substrings(char const *s, char c)
+{
+	char	*string;
+	size_t	i;
+	size_t	len;
+
+	i = 0;
+	len = 0;
+	while (s[len] && s[len] != c)
+		len++;
+	string = malloc (len + 1);
+	if (!string)
+		return (NULL);
+	while (i < len)
+	{
+		string[i] = s[i];
+		i++;
+	}
+	string[i] = '\0';
+	return (string);
+}
+
+static void	free_things(char **ptr)
+{
+	unsigned int	i;
+
+	i = 0;
+	if (ptr)
+	{
+		while (ptr[i])
+		{
+			free(ptr[i]);
+			i++;
+		}
+	}
+	free(ptr);
+}
+
+char	**fill_substrings(char const *s, char **str, char c)
+{
+	int	i;
+
+	i = 0;
+	while (*s)
+	{
+		while (*s && *s == c)
+			s++;
+		if (*s && *s != c)
+		{
+			str[i] = create_substrings(s, c);
+			if (str[i] == NULL)
+			{
+				free_things(str);
+				return (NULL);
+			}
+			i++;
+		}
+		while (*s && *s != c)
+			s++;
+	}
+	str[i] = NULL;
+	return (str);
+}
+
+char	**ft_split(char const *s, char c)
+{
+	char		**ptr;
+
+	ptr = ft_calloc(sizeof(char *), (num_of_substrings(s, c)) + 1);
+	if (!ptr)
+		return (NULL);
+	return (fill_substrings(s, ptr, c));
+}
+
+char	*ft_strjoin(const char *s1, const char *s2)
+{
+	char	*result;
+	size_t	total_len;
+
+	if (!s1 && !s2)
+		return (NULL);
+	if (!s1)
+		return (ft_strdup(s2));
+	if (!s2)
+		return (ft_strdup(s1));
+	total_len = ft_strlen(s1) + ft_strlen(s2);
+	result = (char *)malloc(sizeof(char) * (total_len + 1));
+	if (!result)
+		return (NULL);
+	ft_strlcpy(result, s1, total_len + 1);
+	ft_strlcat(result, s2, total_len + 1);
+	return (result);
+}
+
+int	ft_isalpha(int c)
+{
+	return (ft_isupper(c) || ft_islower(c));
+}
+
 void	*ft_calloc(size_t nmemb, size_t size)
 {
 	void	*new;
@@ -26,6 +158,22 @@ void	ft_bzero(void *s, size_t n)
 		((unsigned char *)s)[n - 1] = '\0';
 		n--;
 	}
+}
+
+char	*ft_strchr(const char *s, int c)
+{
+	char			*string;
+	unsigned char	value;
+	if (!s)
+		return (NULL);
+	string = (char *)s;
+	value = c;
+	while (*string != value && *string != '\0')
+		string++;
+	if (*string == value)
+		return (string);
+	else
+		return (NULL);
 }
 
 char	*ft_strdup(const char *s)

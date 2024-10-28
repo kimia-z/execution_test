@@ -14,6 +14,19 @@
 // 	}
 // }
 
+static bool	is_valid(t_parser *parser, char **current_cmd, int i)
+{
+	if (ft_isalpha(current_cmd[i][0]) == 0)
+	{
+		ft_putstr_fd("export: ", STDERR_FILENO);
+		ft_putstr_fd(current_cmd[i], STDERR_FILENO);
+		error_msg(" : not valid");
+		parser->exit_status = 1;
+		return (false);
+	}
+	return (true);
+}
+
 int my_lstsize(t_env *lst)
 {
 	int count;
@@ -145,6 +158,28 @@ t_env *ft_sort_env(t_env *env_vars)
  * and then adds or updates the variables accordingly.
  */
 
+bool ft_node_checker(t_parser *parser, t_env *env, char *cmd)
+{
+	t_env *temp;
+
+	temp = env;
+	while (temp)
+	{
+		if (ft_strncmp(temp->key, cmd, ft_strlen(temp->key)) == 0)
+		{
+			if (temp->value != NULL)
+			{
+				free(temp->value);
+				temp->value = ft_strdup;
+			}
+		}
+		temp = temp->next;
+	}
+}
+
+void key_with_value()
+{}
+
 void print_export(t_parser *parser, int outfile)
 {
 	t_env *sorted_env;
@@ -186,6 +221,21 @@ void ft_export(t_command *commands, t_parser *parser)
 	}
 	while (commands->command[i])
 	{
+		if (is_valid(parser, commands->command, i) == true)
+		{
+			if (ft_strchr(commands->command[i], '=') != NULL)
+			{
+				//key_value
+				key_with_value(parser, parser->envs, commands->command[i]);
+			}
+			else
+			{
+				if (ft_node_checker(parser, parser->envs, commands->command[i]) == false)
+				{
+					ft_add_node(parser, parser->envs, commands->command[i]);
+				}
+			}
+		}
 		// parse and (add or modified) env variables
 		i++;
 	}
