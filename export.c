@@ -1,29 +1,22 @@
-#include <lexer.h>
+#include "mini.h"
 
-///export with arguments
+/// export with arguments
 
-typedef struct s_env
+// void	free_env_list(t_env *list)
+// {
+// 	t_env	*temp;
+
+// 	while(list)
+// 	{
+// 		temp = list->next;
+// 		free (list);
+// 		list = temp;
+// 	}
+// }
+
+int my_lstsize(t_env *lst)
 {
-	char	*key;
-	char	*value;
-	t_env	*next;
-}	t_env;
-
-void	free_env_list(t_env *list)
-{
-	t_env	*temp;
-
-	while(list)
-	{
-		temp = list->next;
-		free (list);
-		list = temp;
-	}
-}
-
-int	my_lstsize(t_env *lst)
-{
-	int		count;
+	int count;
 
 	count = 0;
 	if (lst == NULL)
@@ -36,9 +29,9 @@ int	my_lstsize(t_env *lst)
 	return (count);
 }
 
-t_env	*my_lstnew(char *key, char *value)
+t_env *my_lstnew(char *key, char *value)
 {
-	t_env	*new_node;
+	t_env *new_node;
 
 	new_node = (t_env *)malloc(1 * sizeof(t_env));
 	if (!new_node)
@@ -49,7 +42,7 @@ t_env	*my_lstnew(char *key, char *value)
 	return (new_node);
 }
 
-t_env	*my_lstlast(t_env *lst)
+t_env *my_lstlast(t_env *lst)
 {
 	if (!lst)
 		return (NULL);
@@ -58,17 +51,17 @@ t_env	*my_lstlast(t_env *lst)
 	return (lst);
 }
 
-void	my_lstadd_back(t_env **lst, t_env *new)
+void my_lstadd_back(t_env **lst, t_env *new)
 {
-	t_env	*last;
+	t_env *last;
 
 	if (!lst || !new)
-		return ;
+		return;
 	last = NULL;
 	if (!*lst)
 	{
 		*lst = new;
-		return ;
+		return;
 	}
 	else
 	{
@@ -77,11 +70,11 @@ void	my_lstadd_back(t_env **lst, t_env *new)
 	}
 }
 
-t_env	*ft_copy_list(t_env *env_vars)
+t_env *ft_copy_list(t_env *env_vars)
 {
-	t_env	*copy_list;
-	t_env	*new_node;
-	int		len;
+	t_env *copy_list;
+	t_env *new_node;
+	int len;
 
 	len = my_lstsize(env_vars);
 	while (len > 0)
@@ -93,22 +86,39 @@ t_env	*ft_copy_list(t_env *env_vars)
 	}
 	return (copy_list);
 }
+// void print_t_env(t_env *my_env)
+// {
+// 	t_env *temp;
 
+// 	temp = my_env;
+// 	while (temp)
+// 	{
+// 		ft_putstr_fd("declare -x ", 1);
+// 		ft_putstr_fd(temp->key, 1);
+// 		if (temp->value)
+// 		{
+// 			ft_putstr_fd("=\"", 1);
+// 			ft_putstr_fd(temp->value, 1);
+// 			ft_putchar_fd('\n', 1);
+// 		}
+// 		temp = temp->next;
+// 	}
+// }
 
-//bubble sort the env variables
-t_env	*ft_sort_env(t_env *env_vars)
+// bubble sort the env variables
+t_env *ft_sort_env(t_env *env_vars)
 {
-	t_env	*temp_list;
-	t_env	*copy_list;
-	char	*temp;
-	int		len_list;
+	t_env *temp_list;
+	t_env *copy_list;
+	char *temp;
+	int len_list;
 
 	temp_list = env_vars;
 	copy_list = ft_copy_list(temp_list);
-	temp_list = copy_list;
 	len_list = my_lstsize(copy_list);
 	while (len_list > 0)
 	{
+		temp_list = copy_list;
 		while (temp_list && temp_list->next)
 		{
 			if (strcmp(temp_list->key, temp_list->next->key) > 0)
@@ -124,23 +134,23 @@ t_env	*ft_sort_env(t_env *env_vars)
 		}
 		len_list--;
 	}
-	return(copy_list);
+	return (copy_list);
 }
 /**
  * ft_export - Handles the export of environment variables in the shell.
  * 1) either display all environment variables in the current shell (sorted env)
  *  or to add/update environment variables based on the provided
  * arguments. If arguments are provided, it validates each argument to ensure
- * it follows the correct format for environment variable assignments, 
+ * it follows the correct format for environment variable assignments,
  * and then adds or updates the variables accordingly.
  */
 
-void	print_export(t_lexer *lexer, int outfile)
+void print_export(t_parser *parser, int outfile)
 {
-	t_env	*sorted_env;
-	t_env	*temp;
+	t_env *sorted_env;
+	t_env *temp;
 
-	sorted_env = ft_sort_env(lexer->env);
+	sorted_env = ft_sort_env(parser->envs);
 	temp = sorted_env;
 	while (temp)
 	{
@@ -150,32 +160,34 @@ void	print_export(t_lexer *lexer, int outfile)
 		{
 			ft_putstr_fd("=\"", outfile);
 			ft_putstr_fd(temp->value, outfile);
-			ft_putchar_fd('"', outfile);
+			ft_putchar_fd('\n', outfile);
 		}
 		temp = temp->next;
 	}
 	free_env_list(sorted_env);
 }
 
-void	ft_export(t_lexer *lexer)
+void ft_export(t_command *commands, t_parser *parser)
 {
-	int	outfile;
-	int	i;
+	int outfile;
+	int i;
 
 	i = 1;
-	//outfile = lexer.outfile;
-	if (!outfile)
+	outfile = commands->outfile_fd;
+	if (outfile == -2)
 	{
 		outfile = STDOUT_FILENO;
 	}
-	if (lexer->tokens[1] == NULL)
+	if (commands->command[1] == NULL)
 	{
-		print_export(lexer, outfile);
-		return ;
+		print_export(parser, outfile);
+		parser->exit_status = 0;
+		return;
 	}
-	while (lexer->tokens[i])
+	while (commands->command[i])
 	{
 		// parse and (add or modified) env variables
 		i++;
 	}
+	parser->exit_status = 0;
 }

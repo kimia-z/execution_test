@@ -56,8 +56,8 @@ bool	check_builtin(t_command *commands, t_parser *parser)
 		return (ft_pwd(commands, parser), true);
 	if (cmd == ENV)
 		return (ft_env(commands, parser), true);
-	// if (cmd == EXPORT)
-	// 	return (ft_export(commands, parser), true);
+	if (cmd == EXPORT)
+		return (ft_export(commands, parser), true);
 	if (cmd == UNSET)
 		return (ft_unset(commands, parser), true);
 	if (cmd == EXIT)
@@ -317,11 +317,14 @@ int main(int argc, char **argv, char **env)
 {
 	(void)argc;
 	(void)argv;
+	//(void)env;
 	//test_echo();
 	//test_pwd();
 	//test_exit();
 	//test_env(env);
 	//test_unset(env);
-	test_cd(env);
+	//test_cd(env);
+	//test_pwd();
+	test_export(env);
 	return 0;
 }

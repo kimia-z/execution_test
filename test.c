@@ -186,9 +186,43 @@ void	test_cd(char **envp)
 	t_parser	*parser = malloc (sizeof(t_parser));
 	t_command	*commands = malloc(sizeof(t_command));
 	t_env	*env = initial_env(envp);
-	char	**cmds = malloc (sizeof(char *) * 2);
+	// char	**cmds = malloc (sizeof(char *) * 3);
+	// cmds[0] = "cd";
+	// cmds[1] = "..";
+	// cmds[2] = NULL;
+	char	**cmds = malloc (sizeof(char *) * 3);
 	cmds[0] = "cd";
-	cmds[1] = NULL;
+	cmds[1] = "/Users/kimiaziari/codam";
+	cmds[2] = NULL;
+	commands->next = NULL;
+	commands->path = NULL;
+	commands->infile_fd = -2;
+	commands->outfile_fd = -2;
+	commands->command = cmds;
+	parser->commands = commands;
+	parser->exit_status = -2;
+	parser->nb_pipes = 0;
+	parser->envs = env;
+	
+	ft_execute(parser);
+}
+
+void	test_export(char **envp)
+{
+	//cmd1 : export
+	//cmd2 : export USER=kimia
+	//cmd3 : export VAR=new_var
+
+	t_parser	*parser = malloc (sizeof(t_parser));
+	t_command	*commands = malloc(sizeof(t_command));
+	t_env	*env = initial_env(envp);
+	// char **cmds = malloc (sizeof(char *) * 2);
+	// cmds[0] = "export";
+	// cmds[1] = NULL;
+	char **cmds = malloc (sizeof(char *) * 3);
+	cmds[0] = "export";
+	cmds[1] = "USER=kimia";
+	cmds[2] = NULL;
 	commands->next = NULL;
 	commands->path = NULL;
 	commands->infile_fd = -2;

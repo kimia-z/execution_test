@@ -70,6 +70,7 @@ void	ft_exit(t_command *commands, t_parser *parser);
 void	ft_env(t_command *commands, t_parser *parser);
 void	ft_unset(t_command *commands, t_parser *parser);
 void	ft_cd(t_command *commands, t_parser *parser);
+void	ft_export(t_command *commands, t_parser *parser);
 
 
 void	ft_putendl_fd(char *s, int fd);
@@ -95,3 +96,4 @@ void	test_env(char **envp);
 void	test_print_env(t_env *env);
 void	test_unset(char **envp);
 void	test_cd(char **envp);
+void	test_export(char **envp);

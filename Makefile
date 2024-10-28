@@ -1,6 +1,6 @@
 NAME = mini
 
-SRCS = execute.c echo.c pwd.c exit.c utils.c test.c env.c unset.c cd.c #export.c
+SRCS = execute.c echo.c pwd.c exit.c utils.c test.c env.c unset.c cd.c export.c
 
 FLAGS = -Wall -Wextra -Werror -g
 
