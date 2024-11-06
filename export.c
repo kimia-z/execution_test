@@ -1,5 +1,5 @@
 #include "mini.h"
-
+/*
 /// export with arguments
 
 // void	free_env_list(t_env *list)
@@ -20,7 +20,7 @@ static bool	is_valid(t_parser *parser, char **current_cmd, int i)
 	{
 		ft_putstr_fd("export: ", STDERR_FILENO);
 		ft_putstr_fd(current_cmd[i], STDERR_FILENO);
-		error_msg(" : not valid");
+		ft_putstr_fd(" : not valid\n", STDERR_FILENO);
 		parser->exit_status = 1;
 		return (false);
 	}
@@ -149,7 +149,8 @@ t_env *ft_sort_env(t_env *env_vars)
 	}
 	return (copy_list);
 }
-/**
+*/
+/*
  * ft_export - Handles the export of environment variables in the shell.
  * 1) either display all environment variables in the current shell (sorted env)
  *  or to add/update environment variables based on the provided
@@ -157,7 +158,7 @@ t_env *ft_sort_env(t_env *env_vars)
  * it follows the correct format for environment variable assignments,
  * and then adds or updates the variables accordingly.
  */
-
+/*
 bool ft_node_checker(t_parser *parser, t_env *env, char *cmd)
 {
 	t_env *temp;
@@ -241,3 +242,4 @@ void ft_export(t_command *commands, t_parser *parser)
 	}
 	parser->exit_status = 0;
 }
+*/

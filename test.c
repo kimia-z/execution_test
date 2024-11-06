@@ -235,3 +235,83 @@ void	test_export(char **envp)
 	
 	ft_execute(parser);
 }
+
+void	test_one(char **envp)
+{
+	int i = 0;
+	int len = 0;
+	while (envp[len] != NULL)
+	{
+		len++;
+	}
+	//printf("len:%d\n", len);
+	t_parser	*parser = malloc (sizeof(t_parser));
+	t_command	*commands = malloc(sizeof(t_command));
+	t_env	*env = initial_env(envp);
+	parser->arg_env = malloc (sizeof(char *) * (len + 1));
+	while (i < len)
+	{
+		parser->arg_env[i] = ft_strdup(envp[i]);
+		//printf("parser->arg_env[%d]:%s\n", i, parser->arg_env[i]);
+		i++;
+	}
+	parser->arg_env[len] = NULL;
+	char **cmds = malloc (sizeof(char *) * 3);
+	cmds[0] = "ls";
+	cmds[1] = "-la";
+	cmds[2] = NULL;
+	commands->next = NULL;
+	commands->path = "/bin/ls";
+	commands->infile_fd = -2;
+	commands->outfile_fd = -2;
+	commands->command = cmds;
+	parser->commands = commands;
+	parser->exit_status = -2;
+	parser->nb_pipes = 0;
+	parser->envs = env;
+	
+	ft_execute(parser);
+}
+
+void	test_one_pipe(char **envp)
+{
+	int i = 0;
+	int len = 0;
+	while (envp[len] != NULL)
+		len++;
+	t_parser	*parser = malloc (sizeof(t_parser));
+	t_command	*commands = malloc(sizeof(t_command));
+	t_env	*env = initial_env(envp);
+	parser->arg_env = malloc (sizeof(char *) * (len + 1));
+	while (i < len)
+	{
+		parser->arg_env[i] = ft_strdup(envp[i]);
+		//printf("parser->arg_env[%d]:%s\n", i, parser->arg_env[i]);
+		i++;
+	}
+	parser->arg_env[len] = NULL;
+	char **cmd1 = malloc (sizeof(char *) * 3);
+	cmd1[0] = "ls";
+	cmd1[1] = "-la";
+	cmd1[2] = NULL;
+	char **cmd2 = malloc (sizeof(char *) * 3);
+	cmd2[0] = "wc";
+	cmd2[1] = "-l";
+	cmd2[2] = NULL;
+	commands->command = cmd1;
+	commands->path = "/bin/ls";
+	commands->infile_fd = -2;
+	commands->outfile_fd = -2;
+	commands->next = malloc(sizeof(t_command));
+	commands->next->command = cmd2;
+	commands->next->infile_fd = -2;
+	commands->next->outfile_fd = -2;
+	commands->next->path = "/bin/wc";
+	commands->next->next = NULL;
+	parser->commands = commands;
+	parser->exit_status = -2;
+	parser->nb_pipes = 1;
+	parser->envs = env;
+	
+	ft_execute(parser);
+}

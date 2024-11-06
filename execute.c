@@ -34,8 +34,8 @@ static t_builtin	get_builtin_command(const char *cmd)
 		return (PWD);
 	if (!strcmp(cmd, "env"))
 		return (ENV);
-	if (!strcmp(cmd, "export"))
-		return (EXPORT);
+	// if (!strcmp(cmd, "export"))
+	// 	return (EXPORT);
 	if (!strcmp(cmd, "unset"))
 		return (UNSET);
 	if (!strcmp(cmd, "exit"))
@@ -56,32 +56,32 @@ bool	check_builtin(t_command *commands, t_parser *parser)
 		return (ft_pwd(commands, parser), true);
 	if (cmd == ENV)
 		return (ft_env(commands, parser), true);
-	if (cmd == EXPORT)
-		return (ft_export(commands, parser), true);
+	// if (cmd == EXPORT)
+	// 	return (ft_export(commands, parser), true);
 	if (cmd == UNSET)
 		return (ft_unset(commands, parser), true);
 	if (cmd == EXIT)
 		return (ft_exit(commands, parser), true);
 	return (false);
 }
-/*
-int	first_pipe(t_parser *parser, int *fds)
+
+int	first_pipe(t_command *temp, int *fds)
 {
-	if (parser->infile_fd == -1)
+	if (temp->infile_fd == -1)
 		return (EXIT_FAILURE);
-	if (parser->infile_fd != -2)
+	if (temp->infile_fd != -2)
 	{
-		if (dup2(parser->infile_fd, STDIN_FILENO) == -1)
+		if (dup2(temp->infile_fd, STDIN_FILENO) == -1)
 		{
 			return (EXIT_FAILURE);
 		}
-		close(parser->infile_fd);
+		close(temp->infile_fd);
 	}
-	if (parser->outfile_fd == -1)
+	if (temp->outfile_fd == -1)
 		return(EXIT_FAILURE);
-	if (parser->outfile_fd != -2)
+	if (temp->outfile_fd != -2)
 	{
-		if (dup2(parser->outfile_fd, STDOUT_FILENO) == -1)
+		if (dup2(temp->outfile_fd, STDOUT_FILENO) == -1)
 			return (EXIT_FAILURE);
 	}
 	else
@@ -92,23 +92,23 @@ int	first_pipe(t_parser *parser, int *fds)
 	return (EXIT_SUCCESS);
 }
 
-int	last_pipe(t_parser *parser, int *fds)
+int	last_pipe(t_command *temp, int *fds)
 {
-	if (parser->outfile_fd == -1)
+	if (temp->outfile_fd == -1)
 		return (EXIT_FAILURE);
-	if (parser->outfile_fd != -2)
+	if (temp->outfile_fd != -2)
 	{
-		if (dup2(parser->outfile_fd, STDOUT_FILENO) == -1)
+		if (dup2(temp->outfile_fd, STDOUT_FILENO) == -1)
 		{
 			return (EXIT_FAILURE);
 		}
-		close(parser->outfile_fd);
+		close(temp->outfile_fd);
 	}
-	if (parser->infile_fd == -1)
+	if (temp->infile_fd == -1)
 		return(EXIT_FAILURE);
-	if (parser->infile_fd != -2)
+	if (temp->infile_fd != -2)
 	{
-		if (dup2(parser->infile_fd, STDIN_FILENO) == -1)
+		if (dup2(temp->infile_fd, STDIN_FILENO) == -1)
 			return (EXIT_FAILURE);
 	}
 	else
@@ -119,13 +119,13 @@ int	last_pipe(t_parser *parser, int *fds)
 	return (EXIT_SUCCESS);
 }
 
-int	middle_pipe(t_parser *parser, int *fds)
+int	middle_pipe(t_command *temp, int *fds)
 {
-	if (parser->infile_fd == -1)
+	if (temp->infile_fd == -1)
 		return(EXIT_FAILURE);
-	if (parser->infile_fd != -2)
+	if (temp->infile_fd != -2)
 	{
-		if (dup2(parser->infile_fd, STDIN_FILENO) == -1)
+		if (dup2(temp->infile_fd, STDIN_FILENO) == -1)
 			return (EXIT_FAILURE);
 	}
 	else
@@ -133,11 +133,11 @@ int	middle_pipe(t_parser *parser, int *fds)
 		if (dup2(fds[0], STDIN_FILENO) == -1)
 			return (EXIT_FAILURE);
 	}
-	if (parser->outfile_fd == -1)
+	if (temp->outfile_fd == -1)
 		return(EXIT_FAILURE);
-	if (parser->outfile_fd != -2)
+	if (temp->outfile_fd != -2)
 	{
-		if (dup2(parser->outfile_fd, STDOUT_FILENO) == -1)
+		if (dup2(temp->outfile_fd, STDOUT_FILENO) == -1)
 			return (EXIT_FAILURE);
 	}
 	else
@@ -148,104 +148,109 @@ int	middle_pipe(t_parser *parser, int *fds)
 	return (EXIT_SUCCESS);
 }
 
-int	ft_dup(t_parser *parser, int *fds, int read, int i)
+int	ft_dup(t_command *temp, t_exe *exec, int i, int nb_pipes)
 {
 	if (i == 0)
 	{
-		if (first_pipe(parser, fds) == EXIT_FAILURE)
+		if (first_pipe(temp, exec->fd) == EXIT_FAILURE)
 			return(EXIT_FAILURE);
 	}
-	else if (i == parser->nb_pipes)
+	else if (i == nb_pipes)
 	{
-		if (last_pipe(parser, fds) == EXIT_FAILURE)
+		if (last_pipe(temp, exec->fd) == EXIT_FAILURE)
 			return(EXIT_FAILURE);
 	}
 	else
 	{
-		if (middle_pipe(parser, fds) == EXIT_FAILURE)
+		if (middle_pipe(temp, exec->fd) == EXIT_FAILURE)
 			return(EXIT_FAILURE);
 	}
-	close(fds[0]);
-	close(fds[1]);
+	close(exec->fd[0]);
+	close(exec->fd[1]);
 	return (EXIT_SUCCESS);
 }
 
-void	ft_child(t_parser *parser, int *fds, int read, int i)
+void	ft_child(t_parser *parser, t_command *temp, t_exe *exec)
 {
 	// find/have/check path
-	if (dup_manager(parser, fds, read, i) == EXIT_FAILURE)
+	if (ft_dup(temp, exec, exec->i, parser->nb_pipes) == EXIT_FAILURE)
 	{
-		close(fds[0]);
-		close(fds[1]);
-		if (read != STDIN_FILENO)
-			close (read);
+		close(exec->fd[0]);
+		close(exec->fd[1]);
+		if (exec->read != STDIN_FILENO)
+			close (exec->read);
 		//free
 		write_stderr("failed in dup");
 		exit(EXIT_FAILURE);
 	}
-	if (check_builtin(parser->commands) == false)
+	if (check_builtin(temp, parser) == false)
 	{
-		if (parser->commands->path != NULL)
+		for (int j = 0; temp->command[j]; j++)
 		{
-			execve(parser->commands->path, parser->commands, parser->envp);
-			write_stderr("Command not found");
-			//free
-			exit(127);
+			printf("command[%d]:%s\n", j, temp->command[j]);
 		}
+		// for (int k = 0; parser->arg_env[k]; k++)
+		// {
+		// 	printf("arg[%d]:%s\n", k, parser->arg_env[k]);
+		// }
+		//printf("path:%s\n", temp->path);
+		if (temp->path != NULL)
+		{
+			printf("path:%s\n", temp->path);
+			execve(temp->path, temp->command, parser->arg_env);
+		}
+		write_stderr("Command not found");
+		//free
+		exit(127);
 	}
 	//free
 	exit(EXIT_SUCCESS);
 }
 
 
-void	ft_parent(t_parser *parser, int read, int *fds)
+void	ft_parent(t_command *temp, t_exe *exec)
 {
-	if (parser->outfile_fd != -2 && parser->outfile_fd != -1)
-		close (parser->outfile_fd);
-	if (parser->infile_fd != -2 && parser->infile_fd != -1)
-		close (parser->infile_fd);
-	close(fds[1]);
-	if (read != STDIN_FILENO)
-		close (read);
-	//read stored in data structure?
-	read = fds[0];
+	if (temp->outfile_fd != -2 && temp->outfile_fd != -1)
+		close (temp->outfile_fd);
+	if (temp->infile_fd != -2 && temp->infile_fd != -1)
+		close (temp->infile_fd);
+	close(exec->fd[1]);
+	if (exec->read != STDIN_FILENO)
+		close (exec->read);
+	exec->read = exec->fd[0];
 }
 
 int	pipeline(t_parser *parser)
 {
-	int			read;
-	int			fds[2];
-	int			pid;
+	t_exe		exec;
 	t_command	*temp;
-	int			i;
-	int			status;
 
-	read = STDIN_FILENO;
+	exec.read = STDIN_FILENO;
 	temp = parser->commands;
-	i = 0;
+	exec.i = 0;
 	while (temp != NULL)
 	{
-		if (pipe(fds) == -1)
+		if (pipe(exec.fd) == -1)
 			return (write_stderr("failed in pipe"), EXIT_FAILURE);
-		pid = fork();
-		if (pid == -1)
+		exec.pid = fork();
+		if (exec.pid == -1)
 			return (write_stderr("failed in fork"), EXIT_FAILURE);
-		if (pid == 0)
-			ft_child(parser, fds, read, i);
-		ft_parent(parser, read, fds);
-		i++;
+		if (exec.pid == 0)
+			ft_child(parser, temp, &exec);
+		ft_parent(temp, &exec);
+		exec.i++;
 		temp = temp->next;
 	}
-	close (read);
-	waitpid(pid, &status, 0);
-	if (WIFEXITED(status))
-		parser->exit_status = WEXITSTATUS(status);
-	while (waitpid(-1, &status, 0) > 0)
+	close (exec.read);
+	waitpid(exec.pid, &exec.status, 0);
+	if (WIFEXITED(exec.status))
+		parser->exit_status = WEXITSTATUS(exec.status);
+	while (waitpid(-1, &exec.status, 0) > 0)
 	{
 	}
 	return (parser->exit_status);
 }
-*/
+
 
 void	write_stderr(char *errmsg)
 {
@@ -272,11 +277,20 @@ int	execute_one_cmd(t_parser *parser, t_command *commands)
 			if (dup2(commands->infile_fd, STDIN_FILENO) == -1)
 				return (EXIT_FAILURE);
 		}
-		if (commands->outfile >= 0)
+		if (commands->outfile_fd >= 0)
 		{
 			if (dup2(commands->outfile_fd, STDOUT_FILENO) == -1)
 				return (EXIT_FAILURE);
 		}
+		// for (int j = 0; commands->command[j]; j++)
+		// {
+		// 	printf("command[%d]:%s\n", j, commands->command[j]);
+		// }
+		// for (int k = 0; parser->arg_env[k]; k++)
+		// {
+		// 	printf("arg[%d]:%s\n", k, parser->arg_env[k]);
+		// }
+		// printf("path:%s\n", commands->path);
 		if (commands->path != NULL)
 			execve(commands->path, commands->command, parser->arg_env);
 		write_stderr("Command not found");
@@ -286,7 +300,7 @@ int	execute_one_cmd(t_parser *parser, t_command *commands)
 	if (commands->infile_fd != -2)
 		close (commands->infile_fd);
 	if (commands->outfile_fd != -2)
-		close (commands->outfile);
+		close (commands->outfile_fd);
 	// if there is here doc -> unlink
 	waitpid(pid, &status, 0);
 	if (WIFEXITED(status))
@@ -341,13 +355,14 @@ int	ft_execute(t_parser *parser)
 		{
 			// find/have/check path
 			parser->exit_status = execute_one_cmd(parser, parser->commands);
+			printf("status:%d\n", parser->exit_status);
 			//free path?
 		}
 	}
-	// else if (number_pipe >= 1)
-	// {
-	// 	parser->exit_status = pipline(parser);
-	// }
+	else if (number_pipe >= 1)
+	{
+		parser->exit_status = pipeline(parser);
+	}
 	return (parser->exit_status);
 }
 
@@ -363,6 +378,8 @@ int main(int argc, char **argv, char **env)
 	//test_unset(env);
 	//test_cd(env);
 	//test_pwd();
-	test_export(env);
+	//test_export(env);
+	//test_one(env);
+	test_one_pipe(env);
 	return 0;
 }

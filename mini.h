@@ -21,6 +21,16 @@
 #include <fcntl.h>
 #include <sys/wait.h>
 
+typedef struct s_exe
+{
+	int	fd[2];
+	int	read;
+	int	i;
+	int pid;
+	int	status;
+}	t_exe;
+
+
 typedef struct s_env
 {
 	char			*key;
@@ -80,6 +90,8 @@ size_t	ft_strlen(const char *s);
 int		ft_strncmp(const char *s1, const char *s2, size_t n);
 int		ft_isdigit(int c);
 int		ft_isspace(int c);
+int		ft_islower(int c);
+int		ft_isupper(int c);
 int		ft_isalpha(int c);
 void	ft_bzero(void *s, size_t n);
 char	*ft_strchr(const char *s, int c);
@@ -91,6 +103,7 @@ char	**ft_split(char const *s, char c);
 char	*ft_strjoin(const char *s1, const char *s2);
 t_env	*initial_env(char **env);
 void	free_env_list(t_env *head);
+void	write_stderr(char *errmsg);
 
 
 void	test_echo(void);
@@ -101,3 +114,5 @@ void	test_print_env(t_env *env);
 void	test_unset(char **envp);
 void	test_cd(char **envp);
 void	test_export(char **envp);
+void	test_one(char **envp);
+void	test_one_pipe(char **envp);

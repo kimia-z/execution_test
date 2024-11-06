@@ -1,5 +1,15 @@
 #include "mini.h"
 
+int	ft_islower(int c)
+{
+	return (c >= 'a' && c <= 'z');
+}
+
+int	ft_isupper(int c)
+{
+	return (c >= 'A' && c <= 'Z');
+}
+
 size_t	ft_strlcat(char *dst, const char *src, size_t size)
 {
 	size_t	d_len;

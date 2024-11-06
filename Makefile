@@ -6,7 +6,7 @@ FLAGS = -Wall -Wextra -Werror -g
 
 HEADER = mini.h
 
-SANITIZER = -fsanitize=address #-fsanitize=thread  #-fsanitize=address
+SANITIZER = -fsanitize=address
 
 all: $(NAME)
 
