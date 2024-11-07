@@ -1,5 +1,5 @@
 #include "mini.h"
-/*
+
 /// export with arguments
 
 // void	free_env_list(t_env *list)
@@ -13,6 +13,111 @@
 // 		list = temp;
 // 	}
 // }
+
+static t_env	*create_new_env_node(char *key, char *value)
+{
+	t_env	*node;
+
+	node = malloc(1 * sizeof(t_env));
+	if (node == NULL)
+		return (error_msg("failed in memory allocate\n"), NULL);
+	node->key = ft_strdup(key);
+	if (value != NULL)
+		node->value = ft_strdup(value);
+	else
+		node->value = ft_strdup("");
+	node->next = NULL;
+	return (node);
+}
+
+void	ft_add_node(t_env **env, char *key, char *value)
+{
+	t_env	*temp;
+	t_env	*new_node;
+
+	temp = (*env);
+	while (temp->next != NULL)
+	{
+		temp = temp->next;
+	}
+	new_node = create_new_env_node(key, value);
+	temp->next = new_node;
+}
+
+static bool	env_node_checker_sign(t_env **env, char *key, char *value)
+{
+	t_env	*temp;
+	char	**new_k;
+
+	temp = (*env);
+	new_k = ft_split(key, '=');
+	while (temp != NULL)
+	{
+		if (ft_strncmp(temp->key, new_k[0], ft_strlen(new_k[0])) == 0)
+		{
+			if (value != NULL)
+			{
+				free(temp->key);
+				temp->key = ft_strcharjoin(new_k[0], '=');
+				free(temp->value);
+				temp->value = ft_strdup(value);
+			}
+			free_2arr(new_k);
+			return (true);
+		}
+		temp = temp->next;
+	}
+	free_2arr(new_k);
+	return (false);
+}
+
+bool	ft_node_checker(t_env **env, char *key, char *value)
+{
+	t_env	*temp;
+
+	temp = (*env);
+	if (ft_node_checker_sign(env, key, value) == true)
+		return (true);
+	while (temp != NULL)
+	{
+		if (ft_strncmp(temp->key, key, sizeof(key)) == 0)
+		{
+			if (value != NULL)
+			{
+				free(temp->value);
+				temp->value = ft_strdup(value);
+			}
+			return (true);
+		}
+		temp = temp->next;
+	}
+	return (false);
+}
+
+void	key_with_value(t_parser *parser,t_env *env, char *cmd)
+{
+	char	*key;
+	char	*value;
+	int		position;
+	char	*temp;
+
+	temp = cmd;
+	position = ft_strchr_pos(cmd, '=');
+	value = ft_strchr(temp, '=') + 1;
+	key = malloc(position + 2 * sizeof(char));
+	if (key == NULL)
+	{
+		parser->exit_status = 1;
+		return ;
+	}
+	ft_strlcpy(key, cmd, position + 2);
+	if (ft_node_checker(env, key, value) == false)
+	{
+		add_node_env(env, key, value);
+	}
+	if (key != NULL)
+		free(key);
+}
 
 static bool	is_valid(t_parser *parser, char **current_cmd, int i)
 {
@@ -149,7 +254,7 @@ t_env *ft_sort_env(t_env *env_vars)
 	}
 	return (copy_list);
 }
-*/
+
 /*
  * ft_export - Handles the export of environment variables in the shell.
  * 1) either display all environment variables in the current shell (sorted env)
@@ -158,8 +263,8 @@ t_env *ft_sort_env(t_env *env_vars)
  * it follows the correct format for environment variable assignments,
  * and then adds or updates the variables accordingly.
  */
-/*
-bool ft_node_checker(t_parser *parser, t_env *env, char *cmd)
+
+bool ft_node_checker(t_env *env, char *cmd)
 {
 	t_env *temp;
 
@@ -178,8 +283,6 @@ bool ft_node_checker(t_parser *parser, t_env *env, char *cmd)
 	}
 }
 
-void key_with_value()
-{}
 
 void print_export(t_parser *parser, int outfile)
 {
@@ -231,15 +334,13 @@ void ft_export(t_command *commands, t_parser *parser)
 			}
 			else
 			{
-				if (ft_node_checker(parser, parser->envs, commands->command[i]) == false)
+				if (ft_node_checker(parser->envs, commands->command[i], NULL) == false)
 				{
-					ft_add_node(parser, parser->envs, commands->command[i]);
+					ft_add_node(parser->envs, commands->command[i], NULL);
 				}
 			}
 		}
-		// parse and (add or modified) env variables
 		i++;
 	}
 	parser->exit_status = 0;
 }
-*/

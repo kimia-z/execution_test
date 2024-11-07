@@ -377,3 +377,76 @@ void	free_env_list(t_env *head)
 		temp = change;
 	}
 }
+
+int	ft_strchr_pos(const char *s, int c)
+{
+	unsigned int	i;
+
+	i = 0;
+	while (s[i] != '\0' && s[i] != (unsigned char)c)
+		i++;
+	if (s[i] == (unsigned char)c)
+		return (i);
+	return (0);
+}
+
+char	*ft_strcharjoin(char *s1, char s2)
+{
+	char	*s;
+	size_t	len;
+
+	len = 3;
+	if (s1 != NULL)
+		len += ft_strlen(s1);
+	s = ft_calloc(sizeof(char), len);
+	if (s == NULL)
+		return (NULL);
+	if (s1 != NULL)
+		ft_strcat(s, s1);
+	ft_strcharcat(s, s2);
+	return (s);
+}
+
+
+void	free_2arr(char **array)
+{
+	int	i;
+
+	i = 0;
+	while (array[i])
+	{
+		free(array[i]);
+		i++;
+	}
+	free(array);
+}
+
+char	*ft_strcat(char *dest, const char *src)
+{
+	int	i;
+	int	j;
+
+	i = 0;
+	while (dest[i] != '\0')
+		i++;
+	j = 0;
+	while (src[j] != '\0')
+	{
+		dest[i + j] = src[j];
+		j++;
+	}
+	dest[i + j] = '\0';
+	return (dest);
+}
+
+char	*ft_strcharcat(char *dest, const char src)
+{
+	int	i;
+
+	i = 0;
+	while (dest[i] != '\0')
+		i++;
+	dest[i] = src;
+	dest[i + 1] = '\0';
+	return (dest);
+}

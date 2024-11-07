@@ -1,29 +1,5 @@
 #include "mini.h"
 
-/* start of the execution 
-example: echo  "kimia" | ls |  grep  "b";
-		 ----   -----    --    ----   -- 
-		 tk[0]  tk[1]   tk[0]  tk[0]  tk[1]
-         ------------    --    -----------
-		   	cmd[0]	    cmd[1]   cmd[2]
-
-command => tokenlist
-*/
-
-/* compare the string to builtins 
-	return value: enum of type builin*/
-
-// static int	change_fd(t_parser *parser)
-// {
-// 	int	fd;
-
-// 	if (parser->outfile == NULL)
-// 		fd = STDOUT_FILENO;
-// 	else
-// 		fd = parser->fd_outfile;
-// 	return (fd);
-// }
-
 static t_builtin	get_builtin_command(const char *cmd)
 {
 	if (!strcmp(cmd, "echo"))

@@ -60,5 +60,4 @@ void	ft_cd(t_command *commands, t_parser *parser)
 		return ;
 	}
 	parser->exit_status = 0;
-	//ft_change_dir(parser, dir);
 }

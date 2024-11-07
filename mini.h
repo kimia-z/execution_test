@@ -55,7 +55,6 @@ typedef struct s_parser
 	int					exit_status;
 	int					nb_pipes;
 	struct s_command	*commands;
-	// struct s_parser		*next;
 	char				**arg_env;
 	struct s_env		*envs;
 }				t_parser;
@@ -104,6 +103,11 @@ char	*ft_strjoin(const char *s1, const char *s2);
 t_env	*initial_env(char **env);
 void	free_env_list(t_env *head);
 void	write_stderr(char *errmsg);
+int		ft_strchr_pos(const char *s, int c);
+char	*ft_strcharjoin(char *s1, char s2);
+void	free_2arr(char **array);
+char	*ft_strcat(char *dest, const char *src);
+char	*ft_strcharcat(char *dest, const char src);
 
 
 void	test_echo(void);
