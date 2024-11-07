@@ -116,3 +116,4 @@ void	test_cd(char **envp);
 void	test_export(char **envp);
 void	test_one(char **envp);
 void	test_one_pipe(char **envp);
+void	test_two_pipe(char **envp);

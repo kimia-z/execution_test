@@ -77,8 +77,6 @@ int	first_pipe(t_command *temp, int *fds)
 		}
 		close(temp->infile_fd);
 	}
-	if (temp->outfile_fd == -1)
-		return(EXIT_FAILURE);
 	if (temp->outfile_fd != -2)
 	{
 		if (dup2(temp->outfile_fd, STDOUT_FILENO) == -1)
@@ -86,27 +84,25 @@ int	first_pipe(t_command *temp, int *fds)
 	}
 	else
 	{
-		printf("befor\n");
+		//write_stderr("before");
 		if (dup2(fds[1], STDOUT_FILENO) == -1) {
-			printf("in\n");
+			//write_stderr("in");
 			return (EXIT_FAILURE);
 		}
-		printf("after\n");
+		//write_stderr("after");
 	}
 	return (EXIT_SUCCESS);
 }
 
-int	last_pipe(t_command *temp, int *fds)
+int	last_pipe(t_command *temp, t_exe *exec)
 {
-	if (temp->outfile_fd == -1)
-		return (EXIT_FAILURE);
 	if (temp->outfile_fd != -2)
 	{
 		if (dup2(temp->outfile_fd, STDOUT_FILENO) == -1)
 		{
 			return (EXIT_FAILURE);
 		}
-		close(temp->outfile_fd);
+		//close(temp->outfile_fd);
 	}
 	if (temp->infile_fd == -1)
 		return(EXIT_FAILURE);
@@ -114,16 +110,18 @@ int	last_pipe(t_command *temp, int *fds)
 	{
 		if (dup2(temp->infile_fd, STDIN_FILENO) == -1)
 			return (EXIT_FAILURE);
+		close(temp->infile_fd);
 	}
 	else
 	{
-		if (dup2(fds[0], STDIN_FILENO) == -1)
+		if (dup2(exec->read, STDIN_FILENO) == -1)
 			return (EXIT_FAILURE);
+		close(exec->read);
 	}
 	return (EXIT_SUCCESS);
 }
 
-int	middle_pipe(t_command *temp, int *fds)
+int	middle_pipe(t_command *temp, t_exe *exec)
 {
 	if (temp->infile_fd == -1)
 		return(EXIT_FAILURE);
@@ -131,14 +129,14 @@ int	middle_pipe(t_command *temp, int *fds)
 	{
 		if (dup2(temp->infile_fd, STDIN_FILENO) == -1)
 			return (EXIT_FAILURE);
+		close(temp->infile_fd);
 	}
 	else
 	{
-		if (dup2(fds[0], STDIN_FILENO) == -1)
+		if (dup2(exec->read, STDIN_FILENO) == -1)
 			return (EXIT_FAILURE);
+		close(exec->read);
 	}
-	if (temp->outfile_fd == -1)
-		return(EXIT_FAILURE);
 	if (temp->outfile_fd != -2)
 	{
 		if (dup2(temp->outfile_fd, STDOUT_FILENO) == -1)
@@ -146,7 +144,7 @@ int	middle_pipe(t_command *temp, int *fds)
 	}
 	else
 	{
-		if (dup2(fds[1], STDOUT_FILENO) == -1)
+		if (dup2(exec->fd[1], STDOUT_FILENO) == -1)
 			return (EXIT_FAILURE);
 	}
 	return (EXIT_SUCCESS);
@@ -161,12 +159,12 @@ int	ft_dup(t_command *temp, t_exe *exec, int i, int nb_pipes)
 	}
 	else if (i == nb_pipes)
 	{
-		if (last_pipe(temp, exec->fd) == EXIT_FAILURE)
+		if (last_pipe(temp, exec) == EXIT_FAILURE)
 			return(EXIT_FAILURE);
 	}
 	else
 	{
-		if (middle_pipe(temp, exec->fd) == EXIT_FAILURE)
+		if (middle_pipe(temp, exec) == EXIT_FAILURE)
 			return(EXIT_FAILURE);
 	}
 	close(exec->fd[0]);
@@ -177,10 +175,8 @@ int	ft_dup(t_command *temp, t_exe *exec, int i, int nb_pipes)
 void	ft_child(t_parser *parser, t_command *temp, t_exe *exec)
 {
 	// find/have/check path
-	printf("ghable ft_dup : %s \n", temp->command[0]);
 	if (ft_dup(temp, exec, exec->i, parser->nb_pipes) == EXIT_FAILURE)
 	{
-		printf("dakhele ft_dup failed : %s \n", temp->command[0]);
 		close(exec->fd[0]);
 		close(exec->fd[1]);
 		if (exec->read != STDIN_FILENO)
@@ -189,21 +185,15 @@ void	ft_child(t_parser *parser, t_command *temp, t_exe *exec)
 		write_stderr("failed in dup");
 		exit(EXIT_FAILURE);
 	}
-	printf("bade ft_dup : %s \n", temp->command[0]);
 	if (check_builtin(temp, parser) == false)
 	{
-		// 	for (int j = 0; temp->command[j]; j++)
-		// {
-		// 	printf("command[%d]:%s\n", j, temp->command[j]);
-		// }
-		// for (int k = 0; parser->arg_env[k]; k++)
-		// {
-		// 	printf("arg[%d]:%s\n", k, parser->arg_env[k]);
-		// }
-		//printf("path:%s\n", temp->path);
 		if (temp->path != NULL)
 		{
-			printf("path:%s\n", temp->path);
+			// for(int j = 0; temp->command[j]; j++)
+			// {
+			// 	write_stderr(temp->command[j]);
+			// }
+			//write_stderr(temp->path);
 			execve(temp->path, temp->command, parser->arg_env);
 		}
 		write_stderr("Command not found");
@@ -362,7 +352,7 @@ int	ft_execute(t_parser *parser)
 		{
 			// find/have/check path
 			parser->exit_status = execute_one_cmd(parser, parser->commands);
-			printf("status:%d\n", parser->exit_status);
+			//printf("status:%d\n", parser->exit_status);
 			//free path?
 		}
 	}
@@ -387,6 +377,7 @@ int main(int argc, char **argv, char **env)
 	//test_pwd();
 	//test_export(env);
 	//test_one(env);
-	test_one_pipe(env);
+	//test_one_pipe(env);
+	test_two_pipe(env);
 	return 0;
 }
