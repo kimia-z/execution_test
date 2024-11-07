@@ -86,8 +86,12 @@ int	first_pipe(t_command *temp, int *fds)
 	}
 	else
 	{
-		if (dup2(fds[1], STDOUT_FILENO) == -1)
+		printf("befor\n");
+		if (dup2(fds[1], STDOUT_FILENO) == -1) {
+			printf("in\n");
 			return (EXIT_FAILURE);
+		}
+		printf("after\n");
 	}
 	return (EXIT_SUCCESS);
 }
@@ -173,8 +177,10 @@ int	ft_dup(t_command *temp, t_exe *exec, int i, int nb_pipes)
 void	ft_child(t_parser *parser, t_command *temp, t_exe *exec)
 {
 	// find/have/check path
+	printf("ghable ft_dup : %s \n", temp->command[0]);
 	if (ft_dup(temp, exec, exec->i, parser->nb_pipes) == EXIT_FAILURE)
 	{
+		printf("dakhele ft_dup failed : %s \n", temp->command[0]);
 		close(exec->fd[0]);
 		close(exec->fd[1]);
 		if (exec->read != STDIN_FILENO)
@@ -183,12 +189,13 @@ void	ft_child(t_parser *parser, t_command *temp, t_exe *exec)
 		write_stderr("failed in dup");
 		exit(EXIT_FAILURE);
 	}
+	printf("bade ft_dup : %s \n", temp->command[0]);
 	if (check_builtin(temp, parser) == false)
 	{
-		for (int j = 0; temp->command[j]; j++)
-		{
-			printf("command[%d]:%s\n", j, temp->command[j]);
-		}
+		// 	for (int j = 0; temp->command[j]; j++)
+		// {
+		// 	printf("command[%d]:%s\n", j, temp->command[j]);
+		// }
 		// for (int k = 0; parser->arg_env[k]; k++)
 		// {
 		// 	printf("arg[%d]:%s\n", k, parser->arg_env[k]);
